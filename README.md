@@ -107,7 +107,7 @@ open up you local host and port
     2. AmazonEC2FullAccess
 
 ## 3. Création du dépôt ECR pour stocker/sauvegarder l'image Docker
-    - Enregistrer l'URI : 566373416292.dkr.ecr.ap-south-1.amazonaws.com/mlproj
+    - Enregistrer l'URI : 211125473976.dkr.ecr.eu-north-1.amazonaws.com/mlapi
 
 ## 4. Création de la machine EC2 (Ubuntu)
 
