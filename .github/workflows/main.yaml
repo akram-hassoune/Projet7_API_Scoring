@@ -85,7 +85,7 @@ jobs:
       - name: Check if container is running
         id: check-container
         run: |
-          docker ps -q --filter "name=mlproj" | grep -q .
+          docker ps -q --filter "name=mlproj" | grep -q . || echo "Container not running"
           echo "::set-output name=container-running::$?"
           
       - name: Stop and remove container if running
