@@ -66,8 +66,8 @@ pip install -r requirements.txt
 
 
 ```bash
-# Finally run the following command
-python app.py
+# Lencement  run de l'api
+uvicorn api:app --reload
 ```
 
 Now,
@@ -75,12 +75,85 @@ Now,
 open up you local host and port
 ```
 
+# Déploiement AWS-CICD avec Github Actions
 
+## 1. Connexion à la console AWS.
+
+## 2. Création d'un utilisateur IAM pour le déploiement
+
+    # avec un accès spécifique
+
+    1. Accès EC2 : Il s'agit d'une machine virtuelle.
+
+    2. ECR : Registre de conteneurs élastiques pour sauvegarder votre image Docker dans AWS.
+
+
+    # Description : À propos du déploiement
+
+    1. Construire une image Docker du code source.
+
+    2. Pousser votre image Docker vers ECR.
+
+    3. Lancer votre EC2.
+
+    4. Tirer votre image depuis ECR dans EC2.
+
+    5. Lancer votre image Docker dans EC2.
+
+    # Politique :
+
+    1. AmazonEC2ContainerRegistryFullAccess
+
+    2. AmazonEC2FullAccess
+
+## 3. Création du dépôt ECR pour stocker/sauvegarder l'image Docker
+    - Enregistrer l'URI : 566373416292.dkr.ecr.ap-south-1.amazonaws.com/mlproj
+
+## 4. Création de la machine EC2 (Ubuntu)
+
+## 5. Ouvrir EC2 et installer Docker sur la machine EC2 :
+
+    # optionnel
+
+    sudo apt-get update -y
+
+    sudo apt-get upgrade
+    
+    # requis
+
+    curl -fsSL https://get.docker.com -o get-docker.sh
+
+    sudo sh get-docker.sh
+
+    sudo usermod -aG docker ubuntu
+
+    newgrp docker
+
+# 6. Configuration d'EC2 en tant que runner auto-hébergé :
+    paramètres > actions > runner > nouveau runner auto-hébergé > choisir le système d'exploitation > exécuter ensuite les commandes une par une
+
+# 7. Configuration des secrets Github :
+
+    AWS_ACCESS_KEY_ID=
+
+    AWS_SECRET_ACCESS_KEY=
+
+    AWS_REGION = us-east-1
+
+    AWS_ECR_LOGIN_URI = demo>>  566373416292.dkr.ecr.ap-south-1.amazonaws.com
+
+    ECR_REPOSITORY_NAME = simple-app
+
+## À propos de MLflow
+MLflow
+
+ - C'est de qualité de production
+ - Suivre toutes vos expériences
+ - Enregistrement et étiquetage de votre modèle
 
 ## MLflow
 
 [Documentation](https://mlflow.org/docs/latest/index.html)
 
 
-##### cmd
-- mlflow ui
+
