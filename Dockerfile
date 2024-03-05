@@ -4,7 +4,7 @@ RUN apt update -y && apt install awscli -y
 WORKDIR /app
 
 COPY . /app
-RUN RUN apt-get install -y build-essential
+RUN apt-get install -y build-essential
 RUN pip install --upgrade pandas shap
 RUN pip install -r packages.txt
 
