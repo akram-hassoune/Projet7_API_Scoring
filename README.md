@@ -39,3 +39,48 @@ L’entreprise souhaite mettre en œuvre un outil de “scoring crédit” pour 
 7. Update the pipeline 
 8. Update the main.py
 9. Update the app.py
+
+# How to run?
+### STEPS:
+
+Clone the repository
+
+```bash
+https://github.com/akram-hassoune/Projet7_API_Scoring
+```
+### STEP 01- Creation d'environement virtual du project 
+
+```bash
+python -m venv env
+```
+
+```bash
+source env/Scripts/activate
+```
+
+
+### STEP 02- installer les requirements
+```bash
+pip install -r requirements.txt
+```
+
+
+```bash
+# Finally run the following command
+python app.py
+```
+
+Now,
+```bash
+open up you local host and port
+```
+
+
+
+## MLflow
+
+[Documentation](https://mlflow.org/docs/latest/index.html)
+
+
+##### cmd
+- mlflow ui
