@@ -1,55 +1,58 @@
-name: workflow
+name: workflow # Nom du workflow, utilisé pour identifier ce workflow dans votre système CI/CD
 
-on:
-  push:
+on: # Événements déclencheurs du workflow
+  push: # Déclenche le workflow lorsqu'un push est effectué sur la branche spécifiée
     branches:
-      - main
-    paths-ignore:
-      - 'README.md'
+      - apitop # Le workflow est déclenché uniquement lorsque des modifications sont poussées sur la branche 'apitop'
+    paths-ignore: # Ignorer les modifications apportées à certains fichiers ou répertoires
+      - 'README.md' # Ignorer les modifications apportées au fichier README.md
+    workflow_dispatch: # Permet de déclencher manuellement le workflow depuis l'interface utilisateur GitHub
 
-permissions:
-  id-token: write
-  contents: read
+permissions: # Gérer les autorisations pour les jetons d'identité et les contenus
+  id-token: write # Autoriser l'écriture pour les jetons d'identité
+  contents: read # Autoriser la lecture pour les contenus
 
-jobs:
-  integration:
-    name: Continuous Integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
+jobs: # Liste des jobs à exécuter dans ce workflow
+  integration: # Job pour l'intégration continue
+    name: Continuous Integration # Nom du job
+    runs-on: ubuntu-latest # Spécifier l'environnement d'exécution du job (dans ce cas, la dernière version d'Ubuntu)
+
+    steps: # Étapes à exécuter dans ce job
+      - name: Checkout Code # Étape pour récupérer le code source depuis le dépôt GitHub
         uses: actions/checkout@v3
 
-      - name: Lint code
+      - name: Lint code # Étape pour vérifier la qualité du code (linting)
         run: echo "Linting repository"
 
-      - name: Run unit tests
+      - name: Run unit tests # Étape pour exécuter les tests unitaires
         run: echo "Running unit tests"
 
-  build-and-push-ecr-image:
-    name: Continuous Delivery
-    needs: integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
+  build-and-push-ecr-image: # Job pour la livraison continue
+    name: Continuous Delivery # Nom du job
+    needs: integration # Spécifier que ce job a besoin que le job d'intégration soit terminé
+    runs-on: ubuntu-latest # Environnement d'exécution du job
+
+    steps: # Étapes à exécuter dans ce job
+      - name: Checkout Code # Étape pour récupérer le code source depuis le dépôt GitHub
         uses: actions/checkout@v3
 
-      - name: Install Utilities
+      - name: Install Utilities # Étape pour installer des utilitaires nécessaires
         run: |
           sudo apt-get update
           sudo apt-get install -y jq unzip
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials # Étape pour configurer les identifiants AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR # Étape pour se connecter à Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push image to Amazon ECR # Étape pour construire, étiqueter et pousser l'image Docker vers Amazon ECR
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -60,20 +63,21 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-  Run-Tests:
-    name: Run Tests
-    needs: integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
+  Run-Tests: # Job pour exécuter les tests
+    name: Run Tests # Nom du job
+    needs: integration # Spécifier que ce job a besoin que le job d'intégration soit terminé
+    runs-on: ubuntu-latest # Environnement d'exécution du job
+
+    steps: # Étapes à exécuter dans ce job
+      - name: Checkout Code # Étape pour récupérer le code source depuis le dépôt GitHub
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python # Configuration de l'environnement Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.12
 
-      - name: Install dependencies
+      - name: Install dependencies # Étape pour installer les dépendances Python
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
@@ -83,43 +87,44 @@ jobs:
           pip install --upgrade pandas shap
           pip install -r packages.txt
 
-      - name: Run tests
+      - name: Run tests # Étape pour exécuter les tests
         run: |
           pytest --html=report.html
 
-      - name: Upload test results
+      - name: Upload test results # Étape pour télécharger les résultats des tests
         uses: actions/upload-artifact@v2
         with:
           name: test-results
           path: report.html
 
-  Continuous-Deployment:
-    needs: build-and-push-ecr-image
-    runs-on: self-hosted
-    steps:
-      - name: Checkout
+  Continuous-Deployment: # Job pour le déploiement continu
+    needs: build-and-push-ecr-image # Spécifier que ce job a besoin que le job de livraison continue soit terminé
+    runs-on: self-hosted # Environnement d'exécution du job
+
+    steps: # Étapes à exécuter dans ce job
+      - name: Checkout # Étape pour récupérer le code source depuis le dépôt GitHub
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials # Étape pour configurer les identifiants AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR # Étape pour se connecter à Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Pull latest images
+      - name: Pull latest images # Étape pour tirer les dernières images Docker
         run: docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
-      - name: Stop and remove container if running
+      - name: Stop and remove container if running # Étape pour arrêter et supprimer le conteneur Docker s'il est en cours d'exécution
         run: |
           docker stop mlproj || true
           docker rm -fv mlproj || true
 
-      - name: Run Docker Image to serve users
+      - name: Run Docker Image to serve users # Étape pour exécuter l'image Docker afin de servir les utilisateurs
         run: |
           docker run -d -p 8080:8080 --name=mlproj \
             -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' \
@@ -127,5 +132,5 @@ jobs:
             -e 'AWS_REGION=${{ secrets.AWS_REGION }}' \
             ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
-      - name: Clean previous images and containers
+      - name: Clean previous images and containers # Étape pour nettoyer les images et les conteneurs Docker précédents
         run: docker system prune -f 
