@@ -1,6 +1,5 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 
-# Mettre à jour le système d'exploitation et installer les dépendances nécessaires
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -13,10 +12,9 @@ WORKDIR /app
 # Copier les fichiers source dans le conteneur
 COPY . /app
 
-# Installer les dépendances Python
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
+RUN apt-get install -y build-essential
+RUN pip install --upgrade pandas shap
+RUN pip install -r packages.txt
 # Exposer le port sur lequel votre application écoute
 EXPOSE 8080
 
