@@ -79,8 +79,9 @@ jobs: # Liste des jobs à exécuter dans ce workflow
 
       - name: Install dependencies # Étape pour installer les dépendances Python
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends \
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential awscli
+
             build-essential \
             awscli \
           && rm -rf /var/lib/apt/lists/*
