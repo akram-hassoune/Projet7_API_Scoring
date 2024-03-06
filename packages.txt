@@ -37,6 +37,7 @@ mdurl==0.1.2
 numba==0.59.0
 numpy==1.26.4
 packaging==23.2
+pandas==1.5.3
 pillow==10.2.0
 plotly==5.18.0
 pluggy==1.4.0
@@ -85,5 +86,4 @@ wheel==0.42.0
 zipp==3.17.0
 python-box==6.0.2
 ensure==1.0.2
-
 -e .
