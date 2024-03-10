@@ -96,7 +96,14 @@ jobs: # Liste des jobs à exécuter dans ce workflow
         uses: actions/upload-artifact@v2
         with:
           name: test-results
-          path: report.html
+          path: rapport_pytest.html
+
+      - name: Download test report
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results
+          path: ${{ github.workspace }}/test-results
+
 
   Continuous-Deployment: # Job pour le déploiement continu
     needs: build-and-push-ecr-image # Spécifier que ce job a besoin que le job de livraison continue soit terminé
